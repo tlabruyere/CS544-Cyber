@@ -2,7 +2,7 @@
 
 import os
 
-trainDir = "/Volumes/Seagate Backup Plus Drive/data/train/"
+trainDir = "/var/data/train/"
 
 ngrams = {}
 count = 1
@@ -31,7 +31,8 @@ for fileName in os.listdir(trainDir):
                 parseNGrams(s)
 
 
-print("printing dict")
+#todo save most common ngrams to file: ngram, ngramId, count
 for w in sorted(ngrams, key=ngrams.get, reverse=True):
-    if ngrams[w] > 10:
-        print(w, ngrams[w])
+    if ngrams[w] > 500:
+        #write ngrams that apper more than 500 times
+        #print(w, ngrams[w])
