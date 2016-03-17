@@ -3,9 +3,8 @@
 import os
 
 trainDir = "/var/data/train/"
-
-ngrams = {}
 count = 1
+ngrams = {}
 
 def parseNGrams(s):
     tokens = s.split(' ')
@@ -18,21 +17,20 @@ def parseNGrams(s):
 
 
 for fileName in os.listdir(trainDir):
-    s = ''
+    
     if fileName.endswith(".bytes"):
-        if( count == 1 or count == 2 or count == 3 or count == 4 or count == 5 or count == 6 or count == 7 or count == 8 or count == 100 or count == 500 or count == 1000 or count == 2000 or count == 4000 or count == 5000):
-            print(count)
         count = count + 1
-        if count > 20:
-            break
+        if count % 100 == 0:
+            print(count)
         with open(trainDir + fileName) as f:
             for line in f:
-                s = line[9:].rstrip('\n')
-                parseNGrams(s)
+                parseNGrams(line[9:].rstrip())
 
-
+print("writing to file")
 #todo save most common ngrams to file: ngram, ngramId, count
 for w in sorted(ngrams, key=ngrams.get, reverse=True):
-    if ngrams[w] > 500:
-        #write ngrams that apper more than 500 times
-        #print(w, ngrams[w])
+    if ngrams[w] > 100:
+        #write ngrams that apper more than 100 times
+        with open("topNGrams.csv","w") as f:
+            f.write(w + " " + ngrams[w] + "\n") 
+            #print(w, ngrams[w])
