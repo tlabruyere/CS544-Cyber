@@ -38,16 +38,19 @@ def classify(beta):
             values = line.rstrip('\n').split(" ")
             label = fileIdToLabel[values[0]]
             wordId = int(values[1])
+           
             wordCount = int(values[2])
             matrixValue = wordCountMatrix[wordId-1,label-1]
             newValue = matrixValue + wordCount
-            wordCountMatrix[wordId-1,label-1] = newValue
+            wordCountMatrix[wordId,label-1] = newValue
             if count % 10000000 == 0:
                 print(count)
             count = count + 1
     #beta = 1.0/numberOfWordsInVocabulary
     #beta = b
     #print(wordCountMatrix)
+
+    
 
     vocabSize = numberOfWordsInVocabulary
     for v in range(0,numberOfClasses):
@@ -98,14 +101,16 @@ def classify(beta):
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0')
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0')
     
-    with open("submissionNGramsBytes-001.csv","w") as f:
+    with open("submissionNGramsBytes-1-fixed-bug.csv","w") as f:
         f.write(classifyHeader + "\n")
         for e in range(0,numberOfTestingExamples):
             prediction = np.argmax(classifyProbabilityMatrix[e,:]) 
             fileId = listOfTestFileNames[e]
             line = "\"" + fileId + "\"" + "," + classifyStrings[prediction] + "\n"
+            #line = "\"" + fileId + "\"" + "," + np.array_str(classifyProbabilityMatrix[e,:])  + "\n"
             f.write(line)
 
     print("DONE")
+    print(len(listOfTestFileNames))
            
-classify(.001)
+classify(1.0)
