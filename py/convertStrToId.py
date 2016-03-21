@@ -17,6 +17,6 @@ def convertStrtoId(csvLabels, idCsvLabels, mappingFile):
 
 if __name__=='__main__':
     convertStrtoId(
-        '/var/data/trainLabels.csv',
-        '/home/tom/idLabels.csv',
-        '/home/tom/mappingFile.csv')
+        'data/trainLabels.csv',
+        'data/idLabels.csv',
+        'data/mappingFile.csv')
