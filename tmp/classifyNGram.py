@@ -42,7 +42,7 @@ def classify(beta):
             matrixValue = wordCountMatrix[wordId-1,label-1]
             newValue = matrixValue + wordCount
             wordCountMatrix[wordId-1,label-1] = newValue
-            if count % 5000000 == 0:
+            if count % 10000000 == 0:
                 print(count)
             count = count + 1
     #beta = 1.0/numberOfWordsInVocabulary
@@ -73,12 +73,13 @@ def classify(beta):
         for line in testData:
             values = line.rstrip('\n').split(" ")
            
-            docId = int(values[0])
+            docId = values[0]
             if docId != lastFileName:
                 listOfTestFileNames.append(docId)
                 lastFileName = docId
             wordId = int(values[1])
             wordCount = int(values[2])
+            #since file name are in order we can just take the size of the listOfTestFileNames to get the correct row index
             testMatrix[len(listOfTestFileNames)-1,wordId] = wordCount
 
     classifySumMatrix = np.dot(testMatrix,wordProbabilityMatrix)
