@@ -38,11 +38,11 @@ def classify(beta):
             values = line.rstrip('\n').split(" ")
             label = fileIdToLabel[values[0]]
             wordId = int(values[1])
-            if wordId != 0: 
-                wordCount = int(values[2])
-                matrixValue = wordCountMatrix[wordId-1,label-1]
-                newValue = matrixValue + wordCount
-                wordCountMatrix[wordId,label-1] = newValue
+             
+            wordCount = int(values[2])
+            matrixValue = wordCountMatrix[wordId,label-1]
+            newValue = matrixValue + wordCount
+            wordCountMatrix[wordId,label-1] = newValue
             if count % 10000000 == 0:
                 print(count)
             count = count + 1
@@ -62,11 +62,10 @@ def classify(beta):
             countOfWInClassV = wordCountMatrix[w,v]
             probabilityOfWGivenV = ((countOfWInClassV) + beta)/ (totalWordsInClassV + beta*vocabSize)
             wordProbabilityMatrix[wordId,label] = probabilityOfWGivenV
-
-    wordProbabilityMatrix = np.log2(wordProbabilityMatrix)
     #print(wordProbabilityMatrix)
 
 
+    wordProbabilityMatrix = np.log2(wordProbabilityMatrix)
     testMatrix = np.zeros((numberOfTestingExamples,numberOfWordsInVocabulary))
 
 
@@ -80,7 +79,8 @@ def classify(beta):
             if docId != lastFileName:
                 listOfTestFileNames.append(docId)
                 lastFileName = docId
-            wordId = int(values[1])
+            wordId = int(values[1]) 
+            
             wordCount = int(values[2])
             #since file name are in order we can just take the size of the listOfTestFileNames to get the correct row index
             testMatrix[len(listOfTestFileNames)-1,wordId] = wordCount
@@ -101,7 +101,7 @@ def classify(beta):
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0')
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0')
     
-    with open("submissionNGramsBytes-1-skip-zeros.csv","w") as f:
+    with open("submissionNGramsBytes-1-log-and-index.csv","w") as f:
         f.write(classifyHeader + "\n")
         for e in range(0,numberOfTestingExamples):
             prediction = np.argmax(classifyProbabilityMatrix[e,:]) 
