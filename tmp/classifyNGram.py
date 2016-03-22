@@ -38,11 +38,11 @@ def classify(beta):
             values = line.rstrip('\n').split(" ")
             label = fileIdToLabel[values[0]]
             wordId = int(values[1])
-           
-            wordCount = int(values[2])
-            matrixValue = wordCountMatrix[wordId-1,label-1]
-            newValue = matrixValue + wordCount
-            wordCountMatrix[wordId,label-1] = newValue
+            if wordId != 0: 
+                wordCount = int(values[2])
+                matrixValue = wordCountMatrix[wordId-1,label-1]
+                newValue = matrixValue + wordCount
+                wordCountMatrix[wordId,label-1] = newValue
             if count % 10000000 == 0:
                 print(count)
             count = count + 1
@@ -101,7 +101,7 @@ def classify(beta):
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0')
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0')
     
-    with open("submissionNGramsBytes-1-fixed-bug.csv","w") as f:
+    with open("submissionNGramsBytes-1-skip-zeros.csv","w") as f:
         f.write(classifyHeader + "\n")
         for e in range(0,numberOfTestingExamples):
             prediction = np.argmax(classifyProbabilityMatrix[e,:]) 
