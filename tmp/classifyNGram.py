@@ -101,13 +101,13 @@ def classify(beta):
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0')
     classifyStrings.append('0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0')
     
-    with open("submissionNGramsBytes-1-log-and-index.csv","w") as f:
+    with open("submissionNGramsBytes-1-log-and-index-raw-delete.csv","w") as f:
         f.write(classifyHeader + "\n")
         for e in range(0,numberOfTestingExamples):
             prediction = np.argmax(classifyProbabilityMatrix[e,:]) 
             fileId = listOfTestFileNames[e]
-            line = "\"" + fileId + "\"" + "," + classifyStrings[prediction] + "\n"
-            #line = "\"" + fileId + "\"" + "," + np.array_str(classifyProbabilityMatrix[e,:])  + "\n"
+            #line = "\"" + fileId + "\"" + "," + classifyStrings[prediction] + "\n"
+            line = "\"" + fileId + "\"" + "," + np.array_str(classifyProbabilityMatrix[e,:])  + "\n"
             f.write(line)
 
     print("DONE")

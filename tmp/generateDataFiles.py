@@ -5,7 +5,7 @@ testDir = "/var/data/test/"
 
 #ngrams = {}
 
-trainFileName = "train.data"
+trainFileName = "train4Gram.data"
 testFileName = "test.data"
 
 def appendDataFile(dataFileName, ngrams, fileId):
@@ -16,8 +16,8 @@ def appendDataFile(dataFileName, ngrams, fileId):
 
 def parseNGrams(s,ngrams):
     tokens = s.split(' ')
-    for i in range(len(tokens)-2):
-        ngram_s = tokens[i] + tokens[i+1]
+    for i in range(len(tokens)-4):
+        ngram_s = tokens[i] + tokens[i+1] + tokens[i+2] + tokens[i+3] 
         ngram = 0
         if '?' not in ngram_s:
             ngram = int(ngram_s,16)
@@ -27,7 +27,7 @@ def parseNGrams(s,ngrams):
             ngrams[ngram] = 1
 
 count = 1
-for fileName in os.listdir(testDir):
+for fileName in os.listdir(trainDir):
     
     if fileName.endswith(".bytes"):
         #if count > 1000:
@@ -36,8 +36,8 @@ for fileName in os.listdir(testDir):
             print(count)
         count = count + 1
         ngrams = {}
-        with open(testDir + fileName) as f:
+        with open(trainDir + fileName) as f:
             for line in f:
                 parseNGrams(line[9:].rstrip(),ngrams)
         fileId = fileName.split(".")[0]
-        appendDataFile(testFileName,ngrams,fileId)
+        appendDataFile(trainFileName,ngrams,fileId)
