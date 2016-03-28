@@ -5,8 +5,12 @@ testDir = "/var/data/test/"
 
 #ngrams = {}
 
-trainFileName = "train4Gram-full.data"
-testFileName = "test-full.data"
+trainFileName = "train.data"
+validationFileName = "validation.data"
+testFileName = "test.data"
+
+
+
 
 def appendDataFile(dataFileName, ngrams, fileId):
     with open(dataFileName,"a") as f:
