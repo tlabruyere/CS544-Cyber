@@ -9,7 +9,24 @@ trainFileName = "train.data"
 validationFileName = "validation.data"
 testFileName = "test.data"
 
+validationDict = {}
+trainDict = {}
 
+with open("validation.label","r") as validation:
+    for line in validation:
+        line = line.rstrip();
+        tokens = line.split(",")
+        fileId = tokens[0]
+        validationDict[fileId] = 1
+
+
+
+with open("train.label","r") as train:
+     for line in train:
+        line = line.rstrip();
+        tokens = line.split(",")
+        fileId = tokens[0]
+        trainDict[fileId] = 1
 
 
 def appendDataFile(dataFileName, ngrams, fileId):
@@ -20,8 +37,8 @@ def appendDataFile(dataFileName, ngrams, fileId):
 
 def parseNGrams(s,ngrams):
     tokens = s.split(' ')
-    for i in range(len(tokens)-4):
-        ngram_s = tokens[i] + tokens[i+1] + tokens[i+2] + tokens[i+3] 
+    for i in range(len(tokens)-2):
+        ngram_s = tokens[i] + tokens[i+1]  
         ngram = 0
         if '?' not in ngram_s:
             ngram = int(ngram_s,16)
@@ -37,11 +54,14 @@ for fileName in os.listdir(trainDir):
         #if count > 1000:
             #break
         if count % 100 == 0:
-            print(count)
+            print(count, " out of 10,800 files processed")
         count = count + 1
         ngrams = {}
         with open(trainDir + fileName) as f:
             for line in f:
                 parseNGrams(line[9:].rstrip(),ngrams)
         fileId = fileName.split(".")[0]
-        appendDataFile(trainFileName,ngrams,fileId)
+        if fileId in validationDict.keys():
+            appendDataFile(validationFileName,ngrams,fileId)
+        else:
+            appendDataFile(trainFileName,ngrams,fileId)
