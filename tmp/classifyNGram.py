@@ -8,7 +8,7 @@ def classify(beta):
     numberOfWordsInVocabulary = 65536
     numberOfClasses = 9
     numberOfTestingExamples = 10873 
-    
+    numberOfValidationExamples = 1083 
 
     classProbabilityMatrix = np.zeros((numberOfClasses,))
     wordProbabilityMatrix = np.zeros((numberOfWordsInVocabulary,numberOfClasses))
@@ -66,29 +66,53 @@ def classify(beta):
 
 
     wordProbabilityMatrix = np.log2(wordProbabilityMatrix)
-    testMatrix = np.zeros((numberOfTestingExamples,numberOfWordsInVocabulary))
+    validationMatrix = np.zeros((numberOfValidationExamples,numberOfWordsInVocabulary))
 
 
-    listOfTestFileNames = []
+    listOfValidationFileNames = []
     lastFileName = ''
-    with open('test.data','r') as testData:
+    with open('validation.data','r') as testData:
         for line in testData:
             values = line.rstrip('\n').split(" ")
            
             docId = values[0]
             if docId != lastFileName:
-                listOfTestFileNames.append(docId)
+                listOfValidationFileNames.append(docId)
                 lastFileName = docId
             wordId = int(values[1]) 
             
             wordCount = int(values[2])
             #since file name are in order we can just take the size of the listOfTestFileNames to get the correct row index
-            testMatrix[len(listOfTestFileNames)-1,wordId] = wordCount
+            validationMatrix[len(listOfValidationFileNames)-1,wordId] = wordCount
 
-    classifySumMatrix = np.dot(testMatrix,wordProbabilityMatrix)
+    classifySumMatrix = np.dot(validationMatrix,wordProbabilityMatrix)
 
     classifyProbabilityMatrix = classifySumMatrix + classProbabilityMatrix
+    
 
+    #confusionMatrix to show a nice visualization of our classifcation accuracy
+    confusionMatrix = np.zeros((numberOfClasses,numberOfClasses))
+    errorCount = 0.0
+    correctCount = 0.0
+    for e in range(0,numberOfValidationExamples):
+        #the prediction for each word is the index + 1 (to account of zero indexing) of the max value of the row  
+        prediction = np.argmax(classifyProbabilityMatrix[e,:]) + 1
+        fileId = listOfValidationFileNames[e]
+        realLabel = fileIdToLabel[fileId]
+        confusionMatrix[realLabel-1,prediction-1] = confusionMatrix[realLabel-1,prediction-1] + 1
+        if prediction != realLabel:
+            errorCount = errorCount + 1.0
+        else:
+            correctCount = correctCount + 1.0
+    print("")
+    print("correct: ", correctCount)
+    print("errors: ", errorCount)
+    print("Beta: ",beta)
+    print("Accuracy: ",correctCount/numberOfValidationExamples)
+    print(confusionMatrix)
+
+
+    '''
     classifyHeader = "\"Id\",\"Prediction1\",\"Prediction2\",\"Prediction3\",\"Prediction4\",\"Prediction5\",\"Prediction6\",\"Prediction7\",\"Prediction8\",\"Prediction9\""
     classifyStrings = []
     classifyStrings.append('1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0')
@@ -112,5 +136,6 @@ def classify(beta):
 
     print("DONE")
     print(len(listOfTestFileNames))
+    '''
            
 classify(1.0)
