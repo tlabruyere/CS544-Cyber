@@ -6,6 +6,7 @@ trainDir = "/var/data/train/"
 
 def classify(beta):
     numberOfWordsInVocabulary = 65536
+    #numberOfWordsInVocabulary =  4294967296
     numberOfClasses = 9
     numberOfTestingExamples = 10873 
     numberOfValidationExamples = 1083 
@@ -43,7 +44,7 @@ def classify(beta):
             matrixValue = wordCountMatrix[wordId,label-1]
             newValue = matrixValue + wordCount
             wordCountMatrix[wordId,label-1] = newValue
-            if count % 10000000 == 0:
+            if count % 100000000 == 0:
                 print(count)
             count = count + 1
     #beta = 1.0/numberOfWordsInVocabulary
@@ -139,3 +140,6 @@ def classify(beta):
     '''
            
 classify(1.0)
+classify(0.1)
+classify(0.01)
+classify(0.001)

@@ -5,8 +5,8 @@ testDir = "/var/data/test/"
 
 #ngrams = {}
 
-trainFileName = "train.data"
-validationFileName = "validation.data"
+trainFileName = "train4G.data"
+validationFileName = "validation4G.data"
 testFileName = "test.data"
 
 validationDict = {}
@@ -37,8 +37,8 @@ def appendDataFile(dataFileName, ngrams, fileId):
 
 def parseNGrams(s,ngrams):
     tokens = s.split(' ')
-    for i in range(len(tokens)-2):
-        ngram_s = tokens[i] + tokens[i+1]  
+    for i in range(len(tokens)-4):
+        ngram_s = tokens[i] + tokens[i+1] + tokens[i+2] + tokens[i+3]  
         ngram = 0
         if '?' not in ngram_s:
             ngram = int(ngram_s,16)
