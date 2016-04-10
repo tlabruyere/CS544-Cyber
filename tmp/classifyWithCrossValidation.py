@@ -65,16 +65,26 @@ print("split data into train and test")
 #pipe_lr = Pipeline([ ('clf', LogisticRegression(random_state=1))])
 #pipe_lr = Pipeline([('scl', StandardScaler()) ,('clf',SVC(kernel='linear', C=10.0, random_state=1))])
 #pipe_lr = Pipeline([('clf',SVC(kernel='linear', C=10.0, random_state=1))])
-pipe_lr = Pipeline([('clf', DecisionTreeClassifier(criterion='entropy',max_depth=40, random_state=0))])
-#pipe_lr = Pipeline([('scl', StandardScaler()),('clf', RandomForestClassifier(criterion='entropy',n_estimators=1000,n_jobs=4, random_state=1))])
+#pipe_lr = Pipeline([('clf', DecisionTreeClassifier(criterion='entropy',max_depth=40, random_state=0))])
+pipe_lr = Pipeline([('clf', RandomForestClassifier(criterion='entropy',n_estimators=1000,n_jobs=-1, random_state=1))])
 #pipe_lr = Pipeline([('scl', StandardScaler()),('clf', KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski'))])
 #pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=1, random_state=0)  )])
 #pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GaussianNB()  )])
 #pipe_lr = Pipeline([('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)  )])
 
 
+'''
+#stochastic svm
+pipe_lr = Pipeline([ ('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
+       eta0=0.0, fit_intercept=True, l1_ratio=0.15,
+       learning_rate='optimal', loss='hinge', n_iter=5, n_jobs=1,
+       penalty='l2', power_t=0.5, random_state=None, shuffle=True,
+       verbose=2, warm_start=False))])
+'''
+
 
 '''
+#stochastic logistic regression
 pipe_lr = Pipeline([ ('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
        eta0=0.0, fit_intercept=True, l1_ratio=0.15,
        learning_rate='optimal', loss='log', n_iter=5, n_jobs=1,
@@ -84,10 +94,10 @@ pipe_lr = Pipeline([ ('clf', SGDClassifier(alpha=0.0001, average=False, class_we
 
 print("starting to build classifier")
 
-#pipe_lr.fit(X_train, y_train)
-#print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
+pipe_lr.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
 
 
-scores = cross_val_score(estimator=pipe_lr, X = X_train, y=y_train, cv=10, n_jobs=1)
-print('CV accuracy scores: %s' % scores)
-print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+#scores = cross_val_score(estimator=pipe_lr, X = X_train, y=y_train, cv=10, n_jobs=1)
+#print('CV accuracy scores: %s' % scores)
+#print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
