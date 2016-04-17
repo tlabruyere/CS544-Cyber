@@ -47,10 +47,10 @@ print (confusion_normalized)
 
 #pylab.clf()
 
-pylab.matshow(confusion_normalized, fignum=False, cmap='Blues', vmin=0, vmax=1.0)
+pylab.matshow(confusion_normalized, fignum=False, cmap='Blues', vmin=0.0, vmax=1.0, interpolation='bicubic')
 ax = pylab.axes()
 ax.set_xticks(range(len(families)))
-ax.set_xticklabels(families,  fontsize=6)
+ax.set_xticklabels(families,  fontsize=6, rotation=45)
 ax.xaxis.set_label_position('top') 
 ax.xaxis.set_ticks_position("top")
 ax.set_yticks(range(len(families)))
