@@ -17,6 +17,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.utils import shuffle
+from sklearn.externals import joblib
+
 
 X = np.zeros((10868,65536))
 y = np.zeros((10868,))
@@ -36,68 +38,106 @@ with open('train.csv', 'r') as data:
             print(row)
 
 
-#X, y = shuffle(X, y, random_state=0)
-#print(y)
-'''    
-
-df = pd.read_csv('train.csv', header=None)
-print("read data into pandas DF")
-
-imr = Imputer(missing_values='NaN', strategy='mean', axis=0)
-imr = imr.fit(df)
-df_imputed = pd.DataFrame(imr.transform(df.values))
-
-print("removed missing data")
-
-X = df_imputed.loc[:, 1:].values
-y = df_imputed.loc[:, 0].values
-'''
-
-
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.20, random_state=1)
 
-#print(y_test)
+
+#joblib.dump(X_train, 'models/X_train.pkl')
+
+#joblib.dump(y_train, 'models/y_train.pkl')
+
 
 print("split data into train and test")
 
-#pipe_lr = Pipeline([('scl', StandardScaler()), ('pca',PCA()) , ('clf', LogisticRegression(random_state=1))])
+#pipe_lr = Pipeline([('scl', StandardScaler()) , ('clf', LogisticRegression(random_state=1))])
 #pipe_lr = Pipeline([ ('clf', LogisticRegression(random_state=1))])
 #pipe_lr = Pipeline([('scl', StandardScaler()) ,('clf',SVC(kernel='linear', C=10.0, random_state=1))])
 #pipe_lr = Pipeline([('clf',SVC(kernel='linear', C=10.0, random_state=1))])
-#pipe_lr = Pipeline([('clf', DecisionTreeClassifier(criterion='entropy',max_depth=40, random_state=0))])
-pipe_lr = Pipeline([('clf', RandomForestClassifier(criterion='entropy',n_estimators=1000,n_jobs=-1, random_state=1))])
-#pipe_lr = Pipeline([('scl', StandardScaler()),('clf', KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski'))])
+pipe_dt = Pipeline([('clf', DecisionTreeClassifier(criterion='entropy',max_depth=40, random_state=1))])
+pipe_rf = Pipeline([('clf', RandomForestClassifier(criterion='entropy',n_estimators=1000,n_jobs=-1, random_state=1))])
+pipe_kn = Pipeline([('scl', StandardScaler()),('clf', KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski'))])
 #pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=1, random_state=0)  )])
 #pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GaussianNB()  )])
-#pipe_lr = Pipeline([('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)  )])
+pipe_nb = Pipeline([('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)  )])
 
 
-'''
+
 #stochastic svm
-pipe_lr = Pipeline([ ('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
+pipe_stochastic_svm = Pipeline([ ('scl', StandardScaler()), ('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
        eta0=0.0, fit_intercept=True, l1_ratio=0.15,
        learning_rate='optimal', loss='hinge', n_iter=5, n_jobs=1,
-       penalty='l2', power_t=0.5, random_state=None, shuffle=True,
-       verbose=2, warm_start=False))])
-'''
+       penalty='l2', power_t=0.5, random_state=1, shuffle=True,
+       verbose=0, warm_start=False))])
 
 
-'''
+
+
 #stochastic logistic regression
-pipe_lr = Pipeline([ ('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
+pipe_lr = Pipeline([ ('scl', StandardScaler()),('clf', SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
        eta0=0.0, fit_intercept=True, l1_ratio=0.15,
        learning_rate='optimal', loss='log', n_iter=5, n_jobs=1,
        penalty='l2', power_t=0.5, random_state=None, shuffle=True,
-       verbose=2, warm_start=False))])
-'''
+       verbose=0, warm_start=False))])
 
-print("starting to build classifier")
 
+
+
+print("***** Random Forest ******")
+
+scores = cross_val_score(estimator=pipe_rf, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+
+pipe_rf.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_rf.score(X_test, y_test))
+
+joblib.dump(pipe_rf, 'models/RandomForestPipeline.pkl') 
+
+
+
+print("***** Stochastic SVM ******")
+scores = cross_val_score(estimator=pipe_stochastic_svm, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+pipe_stochastic_svm.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_stochastic_svm.score(X_test, y_test))
+joblib.dump(pipe_stochastic_svm, 'models/StochasticSVMPipeline.pkl') 
+
+
+print("***** Decision Tree ******")
+scores = cross_val_score(estimator=pipe_dt, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+pipe_dt.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_dt.score(X_test, y_test))
+joblib.dump(pipe_dt, 'models/DecisionTreePipeline.pkl')
+
+
+print("***** Logistic Regression ******")
+scores = cross_val_score(estimator=pipe_lr, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
 pipe_lr.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
+joblib.dump(pipe_lr, 'models/StochasticLogisticRegressionPipeline.pkl')
 
 
-#scores = cross_val_score(estimator=pipe_lr, X = X_train, y=y_train, cv=10, n_jobs=1)
-#print('CV accuracy scores: %s' % scores)
-#print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+
+print("***** Naive Bayes ******")
+scores = cross_val_score(estimator=pipe_nb, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+pipe_nb.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_nb.score(X_test, y_test))
+joblib.dump(pipe_nb, 'models/NaiveBayesPipeline.pkl')
+
+
+'''
+print("***** K Nearest Neighbors ******")
+scores = cross_val_score(estimator=pipe_kn, X = X_train, y=y_train, cv=10, n_jobs=-1)
+print('CV accuracy scores: %s' % scores)
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
+pipe_kn.fit(X_train, y_train)
+print('Test Accuracy: %.3f' % pipe_kn.score(X_test, y_test))
+joblib.dump(pipe_kn, 'models/KNearestNeighborsPipeline.pkl')
+'''
