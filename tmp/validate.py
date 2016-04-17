@@ -37,6 +37,7 @@ def validate(X_test, y_test, pipe, title, fileName):
     confusion_normalized = confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis]
     print (confusion_normalized)
 
+    pylab.clf()
     pylab.matshow(confusion_normalized, fignum=False, cmap='Blues', vmin=0.0, vmax=1.0)
     ax = pylab.axes()
     ax.set_xticks(range(len(families)))
