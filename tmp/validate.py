@@ -63,4 +63,4 @@ pylab.grid(False)
 #pylab.ylabel('True class')
 pylab.grid(False)
 
-pylab.savefig('DecisionTreeConfusionMatrix.png', format='eps', dpi=200)
+pylab.savefig('DecisionTreeConfusionMatrix.png', dpi=100)
