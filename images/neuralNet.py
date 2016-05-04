@@ -14,7 +14,7 @@ for (dirp, dirn, f) in os.walk(os.getcwd()):
     fileNames.extend(f)
 
 #Selecting a random 100 images to traint on
-indices = np.random.permutation(numFiles)[:1000]
+indices = np.random.permutation(numFiles)###[:1000]
 
 trainFileNames = []
 for a in indices:
@@ -36,16 +36,17 @@ testLabels = []
 xtrain = []
 xtest = []
 os.chdir('trainimg/')
-for a in trainFileNames[:-100]:
+testAmount = int(len(indices)/10)
+for a in trainFileNames[:-testAmount]:
     trainLabels.append(allLabels[a[:-10]])
     img = Image.open(a)
-    img = img.resize((1024,1024), Image.BILINEAR)
+    img = img.resize((64,64), Image.BILINEAR)
     xtrain.append(list(img.getdata()))
 
-for a in trainFileNames[-100:]:
+for a in trainFileNames[-testAmount:]:
     testLabels.append(allLabels[a[:-10]])
     img = Image.open(a)
-    img = img.resize((1024,1024), Image.BILINEAR)
+    img = img.resize((64,64), Image.ANTIALIAS)
     xtest.append(list(img.getdata()))
 
 trainCategorical = np_utils.to_categorical(trainLabels)
@@ -53,21 +54,19 @@ testCategorical = np_utils.to_categorical(testLabels)
 xtrain = np.array(xtrain)
 xtest = np.array(xtest)
 
-print(trainCategorical.shape)
-print(testCategorical.shape)
-print(xtest.shape)
-print(xtrain.shape)
-print(xtest[1].shape)
-print(xtrain[1].shape)
-print(xtrain[1][1])
-
 #Build Keras model
 model = Sequential()
-model.add(Dense(16, input_dim=xtrain.shape[1]))
+model.add(Dense(32, input_dim=xtrain.shape[1]))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
-model.add(Dense(16))
+model.add(Dense(32))
 model.add(Activation('relu'))
+model.add(Dropout(0.5))
+model.add(Dense(32))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+model.add(Dense(32))
+model.add(Activation('sigmoid'))
 model.add(Dropout(0.5))
 model.add(Dense(trainCategorical.shape[1]))
 model.add(Activation('softmax'))
