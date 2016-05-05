@@ -33,10 +33,12 @@ def validate(X_test, y_test, pipe, title, fileName):
         confusion_matrix[p-1,r-1] = confusion_matrix[p-1,r-1] + 1
 
     print (confusion_matrix) 
-
+    print ('')
+    
+    '''
     confusion_normalized = confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis]
     print (confusion_normalized)
-
+ 
     pylab.clf()
     pylab.matshow(confusion_normalized, fignum=False, cmap='Blues', vmin=0.0, vmax=1.0)
     ax = pylab.axes()
@@ -51,34 +53,40 @@ def validate(X_test, y_test, pipe, title, fileName):
     pylab.grid(False)
     pylab.grid(False)
     pylab.savefig(fileName, dpi=900)
+    '''
 
 
 
-
+print('')
 
 X_test = joblib.load('models/X_test.pkl')
 y_test = joblib.load('models/y_test.pkl')
 
-pipe_dt = joblib.load('models/DecisionTreePipeline.pkl') 
-validate(X_test, y_test, pipe_dt, "Confusion Matrix for Decision Tree", "DecisionTreeConfusionMatrix.png")
 
 
+print('***** Naive Bayes *****')
 pipe_nb = joblib.load('models/NaiveBayesPipeline.pkl')
 validate(X_test, y_test, pipe_nb, "Confusion Matrix for Naive Bayes", "NaiveBayesConfusionMatrix.png")
 
 
+print('***** Stochastic Logistic Regression *****')
+pipe_log = joblib.load('models/StochasticLogisticRegressionPipeline.pkl')
+validate(X_test, y_test, pipe_log, "Confusion Matrix for Logistic Regression", "LogisticRegressionMatrix.png")
 
-pipe_rf = joblib.load('models/RandomForestPipeline.pkl')
-validate(X_test, y_test, pipe_rf, "Confusion Matrix for Random Forest", "RandomForestConfusionMatrix.png")
 
-
+print('***** Stochastic SVM *****')
 pipe_svm = joblib.load('models/StochasticSVMPipeline.pkl')
 validate(X_test, y_test, pipe_svm, "Confusion Matrix for SVM", "SVMConfusionMatrix.png")
 
 
-pipe_log = joblib.load('models/StochasticLogisticRegressionPipeline.pkl')
-validate(X_test, y_test, pipe_log, "Confusion Matrix for Logistic Regression", "LogisticRegressionMatrix.png")
+print('***** Decision Tree *****')
+pipe_dt = joblib.load('models/DecisionTreePipeline.pkl') 
+validate(X_test, y_test, pipe_dt, "Confusion Matrix for Decision Tree", "DecisionTreeConfusionMatrix.png")
 
+
+print('***** Random Forest *****')
+pipe_rf = joblib.load('models/RandomForestPipeline.pkl')
+validate(X_test, y_test, pipe_rf, "Confusion Matrix for Random Forest", "RandomForestConfusionMatrix.png")
 
 
 
