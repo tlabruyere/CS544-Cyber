@@ -24,6 +24,9 @@ X = np.zeros((10868,65536))
 y = np.zeros((10868,))
 row = 0
 column = 0
+#train.csv has a listing of all the training samples with all their features
+#each row represents a sample with the first column representing the label and the rest of the columns 
+#represent the ngram counts for the 65K features
 with open('train.csv', 'r') as data:
     for line in data:
         line = line.rstrip()
@@ -41,27 +44,18 @@ with open('train.csv', 'r') as data:
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.20, random_state=1)
 
-
-joblib.dump(X_train, 'models/X_train.pkl')
-
-joblib.dump(y_train, 'models/y_train.pkl')
-
+#save off data to file for later use by the validate.py script
 joblib.dump(X_test, 'models/X_test.pkl')
-
 joblib.dump(y_test, 'models/y_test.pkl')
+
 
 
 print("split data into train and test")
 
-#pipe_lr = Pipeline([('scl', StandardScaler()) , ('clf', LogisticRegression(random_state=1))])
-#pipe_lr = Pipeline([ ('clf', LogisticRegression(random_state=1))])
-#pipe_lr = Pipeline([('scl', StandardScaler()) ,('clf',SVC(kernel='linear', C=10.0, random_state=1))])
-#pipe_lr = Pipeline([('clf',SVC(kernel='linear', C=10.0, random_state=1))])
+
 pipe_dt = Pipeline([('clf', DecisionTreeClassifier(criterion='entropy',max_depth=40, random_state=1))])
 pipe_rf = Pipeline([('clf', RandomForestClassifier(criterion='entropy',n_estimators=1000,n_jobs=-1, random_state=1))])
 pipe_kn = Pipeline([('scl', StandardScaler()),('clf', KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski'))])
-#pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=1, random_state=0)  )])
-#pipe_lr = Pipeline([('scl', StandardScaler()),('clf', GaussianNB()  )])
 pipe_nb = Pipeline([('clf', MultinomialNB(alpha=0.01, class_prior=None, fit_prior=True)  )])
 
 
@@ -87,15 +81,12 @@ pipe_lr = Pipeline([ ('scl', StandardScaler()),('clf', SGDClassifier(alpha=0.000
 
 
 print("***** Random Forest ******")
-
 scores = cross_val_score(estimator=pipe_rf, X = X_train, y=y_train, cv=10, n_jobs=-1)
 print('CV accuracy scores: %s' % scores)
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
-
 pipe_rf.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_rf.score(X_test, y_test))
-
-joblib.dump(pipe_rf, 'models/RandomForestPipeline.pkl') 
+#joblib.dump(pipe_rf, 'models/RandomForestPipeline.pkl') 
 
 
 
@@ -105,7 +96,7 @@ print('CV accuracy scores: %s' % scores)
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
 pipe_stochastic_svm.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_stochastic_svm.score(X_test, y_test))
-joblib.dump(pipe_stochastic_svm, 'models/StochasticSVMPipeline.pkl') 
+#joblib.dump(pipe_stochastic_svm, 'models/StochasticSVMPipeline.pkl') 
 
 
 print("***** Decision Tree ******")
@@ -114,7 +105,7 @@ print('CV accuracy scores: %s' % scores)
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
 pipe_dt.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_dt.score(X_test, y_test))
-joblib.dump(pipe_dt, 'models/DecisionTreePipeline.pkl')
+#joblib.dump(pipe_dt, 'models/DecisionTreePipeline.pkl')
 
 
 print("***** Logistic Regression ******")
@@ -123,7 +114,7 @@ print('CV accuracy scores: %s' % scores)
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
 pipe_lr.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
-joblib.dump(pipe_lr, 'models/StochasticLogisticRegressionPipeline.pkl')
+#joblib.dump(pipe_lr, 'models/StochasticLogisticRegressionPipeline.pkl')
 
 
 
@@ -133,15 +124,6 @@ print('CV accuracy scores: %s' % scores)
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
 pipe_nb.fit(X_train, y_train)
 print('Test Accuracy: %.3f' % pipe_nb.score(X_test, y_test))
-joblib.dump(pipe_nb, 'models/NaiveBayesPipeline.pkl')
+#joblib.dump(pipe_nb, 'models/NaiveBayesPipeline.pkl')
 
 
-'''
-print("***** K Nearest Neighbors ******")
-scores = cross_val_score(estimator=pipe_kn, X = X_train, y=y_train, cv=10, n_jobs=-1)
-print('CV accuracy scores: %s' % scores)
-print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores),np.std(scores)))
-pipe_kn.fit(X_train, y_train)
-print('Test Accuracy: %.3f' % pipe_kn.score(X_test, y_test))
-joblib.dump(pipe_kn, 'models/KNearestNeighborsPipeline.pkl')
-'''
